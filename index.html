@@ -79,6 +79,7 @@
 	<body>
 
 		<div class="container">
+			<div id="z_text" style="position: absolute;left: 0;top: 0;">1111</div>
 			<div class="fixed-ball"></div>
 			<div class="moving-ball" id="movingBall"></div>
 			<button id="permissionButton">启用设备方向</button>
@@ -133,6 +134,7 @@
 				} else {
 					messageBox.style.display = 'none'; // 隐藏提示框
 				}
+				document.getElementById('z_text').textContent = ballPositionY;
 			}
 
 			// 检查是否需要请求权限
