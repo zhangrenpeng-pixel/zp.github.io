@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>设备校准功能</title>
+		<style>
+			body,
+			html {
+				height: 100%;
+				margin: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background-color: #e3f2fd;
+			}
+
+			.container {
+				background-color: #b3e5fc;
+				width: 300px;
+				height: 500px;
+				position: relative;
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+			}
+
+			.fixed-ball,
+			.moving-ball {
+				width: 30px;
+				height: 30px;
+				background-color: #4caf50;
+				border-radius: 50%;
+				position: absolute;
+			}
+
+			.fixed-ball {
+				top: 50%;
+				transform: translateY(-50%);
+				background-color: #4caf50;
+				/* 中间固定的小球 */
+			}
+
+			.moving-ball {
+				top: 10%;
+				background-color: #ccc;
+				/* 上方可以移动的小球 */
+			}
+
+			.message-box {
+				position: fixed;
+				top: 40%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background-color: rgba(0, 0, 0, 0.75);
+				color: white;
+				padding: 20px;
+				border-radius: 10px;
+				display: none;
+			}
+
+			#permissionButton {
+				display: none;
+				position: absolute;
+				top: 20px;
+				background-color: #4caf50;
+				color: white;
+				padding: 10px 20px;
+				border: none;
+				border-radius: 5px;
+				font-size: 16px;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="container">
+			<div class="fixed-ball"></div>
+			<div class="moving-ball" id="movingBall"></div>
+			<button id="permissionButton">启用设备方向</button>
+		</div>
+
+		<div class="message-box" id="messageBox">
+			校验成功！
+		</div>
+
+		<script>
+			const movingBall = document.getElementById('movingBall');
+			const messageBox = document.getElementById('messageBox');
+			const permissionButton = document.getElementById('permissionButton');
+
+			// 获取容器高度，用于计算边界
+			const containerHeight = document.querySelector('.container').offsetHeight;
+			const fixedBallY = containerHeight / 2 - 15; // 固定球的Y坐标位置
+
+			// 请求设备方向权限（针对 iOS 设备）
+			function requestPermission() {
+				if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+					DeviceOrientationEvent.requestPermission()
+						.then(permissionState => {
+							if (permissionState === 'granted') {
+								permissionButton.style.display = 'none'; // 隐藏授权按钮
+								window.addEventListener('deviceorientation', handleOrientation);
+							}
+						})
+						.catch(console.error);
+				} else {
+					// 对于其他设备，直接监听设备方向变化
+					window.addEventListener('deviceorientation', handleOrientation);
+				}
+			}
+
+			// 处理设备方向变化的函数
+			function handleOrientation(event) {
+				const beta = event.beta; // 获取设备的俯仰角，范围是 [-180, 180]
+
+				// 调整beta的范围，以确保当beta接近0时，小球处于页面中间
+				const ballPositionY = (90 - beta) * (containerHeight - 60) / 180; // 修正移动范围
+
+				// 限制小球移动范围，防止超出容器 
+				const clampedBallPositionY = Math.max(0, Math.min(ballPositionY, containerHeight - 60));
+
+				// 更新小球位置
+				movingBall.style.top = `${clampedBallPositionY}px`;
+
+				// 检测是否与中间的固定球重合 (误差范围为10像素)
+				if (Math.abs(clampedBallPositionY - fixedBallY) < 10) {
+					messageBox.style.display = 'block'; // 显示校验成功的提示框
+				} else {
+					messageBox.style.display = 'none'; // 隐藏提示框
+				}
+			}
+
+			// 检查是否需要请求权限
+			if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+				permissionButton.style.display = 'block'; // 显示授权按钮
+				permissionButton.addEventListener('click', requestPermission);
+			} else {
+				// 非iOS设备，直接监听设备方向变化
+				window.addEventListener('deviceorientation', handleOrientation);
+			}
+		</script>
+
+	</body>
+</html>
