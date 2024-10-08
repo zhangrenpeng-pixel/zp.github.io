@@ -79,7 +79,12 @@
 	<body>
 
 		<div class="container">
-			<div id="z_text" style="position: absolute;left: 0;top: 0;">1111</div>
+			<div id="z_text" style="position: absolute;left: 0;top: 0;">
+				水平：<span id="z_text1"></span>；<br>
+				高度：<span id="z_text2"></span>；<br>
+				范围：<span id="z_text3"></span>；<br>
+				球球：<span id="z_text4"></span>；
+			</div>
 			<div class="fixed-ball"></div>
 			<div class="moving-ball" id="movingBall"></div>
 			<button id="permissionButton">启用设备方向</button>
@@ -134,7 +139,10 @@
 				} else {
 					messageBox.style.display = 'none'; // 隐藏提示框
 				}
-				document.getElementById('z_text').textContent = '水平：' + beta + ';' + '高度：' + containerHeight + '；' + '范围：' + ballPositionY + '；' + '球球：' + clampedBallPositionY;
+				document.getElementById('z_text1').textContent = beta;
+				document.getElementById('z_text2').textContent = containerHeight;
+				document.getElementById('z_text3').textContent = ballPositionY;
+				document.getElementById('z_text4').textContent = clampedBallPositionY;
 			}
 
 			// 检查是否需要请求权限
