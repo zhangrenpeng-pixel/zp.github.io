@@ -125,7 +125,7 @@
 				const beta = event.beta; // 获取设备的俯仰角，范围是 [-180, 180]
 
 				// 调整beta的范围，以确保当beta接近0时，小球处于页面中间
-				const ballPositionY = (90 - beta) * (containerHeight - 60) / 180; // 修正移动范围
+				const ballPositionY = (90 + beta) * (containerHeight - 60) / 180; // 修正移动范围
 
 				// 限制小球移动范围，防止超出容器 
 				const clampedBallPositionY = Math.max(0, Math.min(ballPositionY, containerHeight - 60));
